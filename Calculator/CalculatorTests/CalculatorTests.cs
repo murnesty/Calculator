@@ -193,7 +193,38 @@ namespace Calculator.Tests
             {
                 Assert.Fail($"Other exception captured : {ex}");
             }
-        } 
+        }
+
+        [TestMethod()]
+        public void CalculateTestMissingStartBracket()
+        {
+            try
+            {
+                var number = Calculator.Calculate("( 1 / 2 ) - 1 + 1)");
+                Assert.Fail("No exception throw");
+            }
+            catch(AssertFailedException ex)
+            {
+                throw;
+            }
+            catch (Exception ex) { }
+        }
+
+        [TestMethod()]
+        public void CalculateTestMissingCloseBracket()
+        {
+            try
+            {
+                var number = Calculator.Calculate("(( 1 / 2 ) - 1 + 1");
+                Assert.Fail("No exception throw");
+            }
+            catch (AssertFailedException ex)
+            {
+                throw;
+            }
+            catch (Exception ex) { }
+        }
+
         #endregion
     }
 }

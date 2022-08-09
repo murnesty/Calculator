@@ -20,8 +20,12 @@ namespace Calculator
         public static double Calculate(string sum)
         {
             var items = ParseStringToItems(sum);
-            var number = (double)ProcessBracketAndCalculate(items);
 
+            var isMatched = IsBracketMatching(items);
+            if (!isMatched)
+                throw new Exception("Brackets not matched");
+
+            var number = (double)ProcessBracketAndCalculate(items);
             return number;
         }
 
@@ -36,17 +40,32 @@ namespace Calculator
                 var groups = match.Groups;
                 if (match.Success)
                 {
-                    if (groups[1].Success) items.Add(new Item(Item.ItemType.Number, decimal.Parse(groups[1].Value)));
-                    else if (groups[2].Success) items.Add(new Item(Item.ItemType.Sum));
-                    else if (groups[3].Success) items.Add(new Item(Item.ItemType.Minus));
-                    else if (groups[4].Success) items.Add(new Item(Item.ItemType.Multiply));
-                    else if (groups[5].Success) items.Add(new Item(Item.ItemType.Divide));
-                    else if (groups[6].Success) items.Add(new Item(Item.ItemType.OpenBracket));
-                    else if (groups[7].Success) items.Add(new Item(Item.ItemType.CloseBracket));
+                    if (groups[1].Success) items.Add(new Item(ItemType.Number, decimal.Parse(groups[1].Value)));
+                    else if (groups[2].Success) items.Add(new Item(ItemType.Sum));
+                    else if (groups[3].Success) items.Add(new Item(ItemType.Minus));
+                    else if (groups[4].Success) items.Add(new Item(ItemType.Multiply));
+                    else if (groups[5].Success) items.Add(new Item(ItemType.Divide));
+                    else if (groups[6].Success) items.Add(new Item(ItemType.OpenBracket));
+                    else if (groups[7].Success) items.Add(new Item(ItemType.CloseBracket));
                 }
             }
 
             return items;
+        }
+
+        private static bool IsBracketMatching(IList<Item> items)
+        {
+            var matchIndex = 0;
+
+            foreach(var item in items)
+            {
+                if (item.Type == ItemType.OpenBracket)
+                    matchIndex++;
+                else if (item.Type == ItemType.CloseBracket)
+                    matchIndex--;
+            }
+
+            return matchIndex == 0;
         }
 
         private static decimal ProcessBracketAndCalculate(IList<Item> items)
@@ -99,8 +118,14 @@ namespace Calculator
 
         private static Item CalculateWithPrecedence(IList<Item> items)
         {
-            var newItems = CalculateSelectedPrecedenceOperators(items, precedences.Where(x => x.Rank == 1));
-            newItems = CalculateSelectedPrecedenceOperators(newItems, precedences.Where(x => x.Rank == 2));
+            var minPrecedence = precedences.MinBy(x => x.Rank).Rank;
+            var maxPrecedence = precedences.MaxBy(x => x.Rank).Rank;
+            var newItems = items;
+
+            for (int i = minPrecedence; i <= maxPrecedence; i++)
+            {
+                newItems = CalculateSelectedPrecedenceOperators(newItems, precedences.Where(x => x.Rank == i));
+            }
 
             if (newItems.Count == 1)
             {
