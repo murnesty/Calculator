@@ -13,6 +13,17 @@ namespace Calculator
         public ItemType Type { get; set; }
         public decimal Number { get; set; }
 
+        public Item(ItemType type, decimal number)
+        {
+            Type = type;
+            Number = number;
+        }
+
+        public Item(ItemType type)
+        {
+            Type = type;
+        }
+
         public override string ToString()
         {
             if (Type == ItemType.Number) return Number.ToString();

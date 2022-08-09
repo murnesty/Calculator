@@ -6,6 +6,7 @@ namespace Calculator.Tests
     [TestClass()]
     public class CalculatorTests
     {
+        #region Simple Math
         [TestMethod()]
         public void CalculateTestSum()
         {
@@ -61,13 +62,73 @@ namespace Calculator.Tests
         {
             var number = Calculator.Calculate("11.1 + 23");
             Assert.AreEqual(number, 34.1);
-        }
+        } 
+        #endregion
 
+        #region Pure precedence test
         [TestMethod()]
-        public void CalculateTestPrecedence()
+        public void CalculateTestPrecedence_SinglePrecedenceLast()
         {
             var number = Calculator.Calculate("1 + 1 * 3");
             Assert.AreEqual(number, 4);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedence_SinglePredenceFirst()
+        {
+            var number = Calculator.Calculate("1 * 3 + 1");
+            Assert.AreEqual(number, 4);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedence_MultiplePrecedenceLast()
+        {
+            var number = Calculator.Calculate("1 + 1 * 3 / 2");
+            Assert.AreEqual(number, 2.5);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedence_MultiplePredenceFirst()
+        {
+            var number = Calculator.Calculate("1 * 3 / 2 + 1");
+            Assert.AreEqual(number, 2.5);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedence_MultiplePredenceMiddle()
+        {
+            var number = Calculator.Calculate("1 + 1 * 3 / 2 - 0.5");
+            Assert.AreEqual(number, 2);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedence_MultiplePredenceTwoEnd()
+        {
+            var number = Calculator.Calculate("1 * 2 + 3 + 2 / 4");
+            Assert.AreEqual(number, 5.5);
+        }
+        #endregion
+
+        #region Bracket test
+        [TestMethod()]
+        public void CalculateTestPrecedenceWithBracket()
+        {
+            var number = Calculator.Calculate("(1 + 1) * 3 / (2 - 0.5)");
+            Assert.AreEqual(number, 4);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedenceWithBracket2()
+        {
+            var number = Calculator.Calculate("(1 + 1) * (3 / (3 - 1))");
+            Assert.AreEqual(number, 3);
+        }
+
+        [TestMethod()]
+        public void CalculateTestPrecedenceWithBracket3()
+        {
+            var number = Calculator.Calculate("( ( 1 + 1 ) * (3 / (3 - 1) ) )");
+            Assert.AreEqual(number, 3);
         }
 
         [TestMethod()]
@@ -106,12 +167,18 @@ namespace Calculator.Tests
         }
 
         [TestMethod()]
+        public void CalculateTestComplicatedBracketWithPrecedence()
+        {
+            var number = Calculator.Calculate("( ( 1 / 2 ) - ( 1 + ( ( 8 - 9 ) / 8 ) ) + ( 3 + 3 ) + ( 4 + ( 2 + 1 ) * 3 ) )");
+            Assert.AreEqual(number, 18.625);
+        }
+
+        [TestMethod()]
         public void CalculateTestBracketNested()
         {
             var number = Calculator.Calculate("10 - ( 2 + 3 * ( 7 - 5 ) ) + 2");
-            Assert.AreEqual(number, 8);
+            Assert.AreEqual(number, 4);
         }
-
 
         [TestMethod()]
         public void CalculateTestBracketNestedDivideByZero()
@@ -126,7 +193,7 @@ namespace Calculator.Tests
             {
                 Assert.Fail($"Other exception captured : {ex}");
             }
-        }
-
+        } 
+        #endregion
     }
 }
