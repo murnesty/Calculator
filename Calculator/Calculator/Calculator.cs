@@ -63,6 +63,11 @@ namespace Calculator
                     matchIndex++;
                 else if (item.Type == ItemType.CloseBracket)
                     matchIndex--;
+
+                if (matchIndex < 0)
+                {
+                    return false;
+                }
             }
 
             return matchIndex == 0;
@@ -89,10 +94,15 @@ namespace Calculator
                         {
                             currentItems = itemStack.Pop();
                             currentItems.Add(numberItem);
+
+                            if (currentItems.Count >= 2 && currentItems[currentItems.Count - 2].Type == ItemType.Number)
+                            {
+                                currentItems.Insert(currentItems.Count - 1, new Item(ItemType.Multiply));
+                            }
                         }
                         else
                         {
-                            currentItems = new List<Item> { numberItem };
+                            throw new Exception("Brackets not matched");
                         }
                         break;
                     default:
@@ -142,6 +152,8 @@ namespace Calculator
             var itemStack = new Stack<Item>();
             Precedence latestPrecedence = null;
 
+            // 1 + 2 * 3
+            // 1 + 6
             foreach (var item in items)
             {
                 var precedence = precedenceOperators.FirstOrDefault(x => x.ItemType == item.Type);

@@ -38,16 +38,7 @@ namespace Calculator.Tests
         [TestMethod()]
         public void CalculateTestDivideByZero()
         {
-            try
-            {
-                var number = Calculator.Calculate("6 / 0");
-                Assert.Fail("No exception throw");
-            }
-            catch (DivideByZeroException ex) { }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Other exception captured : {ex}");
-            }
+            Assert.ThrowsException<DivideByZeroException>(() => Calculator.Calculate("6 / 0"));
         }
 
         [TestMethod()]
@@ -110,6 +101,13 @@ namespace Calculator.Tests
         #endregion
 
         #region Bracket test
+        [TestMethod()]
+        public void CalculateTestBracketAsMultiply()
+        {
+            var number = Calculator.Calculate("2 (1 + 1)");
+            Assert.AreEqual(number, 4);
+        }
+
         [TestMethod()]
         public void CalculateTestPrecedenceWithBracket()
         {
@@ -183,46 +181,19 @@ namespace Calculator.Tests
         [TestMethod()]
         public void CalculateTestBracketNestedDivideByZero()
         {
-            try
-            {
-                var number = Calculator.Calculate("10 - ( 2 + 3 / ( 5 - 5 ) )  + 2");
-                Assert.Fail("No exception throw");
-            }
-            catch (DivideByZeroException ex) { }
-            catch (Exception ex)
-            {
-                Assert.Fail($"Other exception captured : {ex}");
-            }
+            Assert.ThrowsException<DivideByZeroException>(() => Calculator.Calculate("10 - ( 2 + 3 / ( 5 - 5 ) )  + 2"));
         }
 
         [TestMethod()]
         public void CalculateTestMissingStartBracket()
         {
-            try
-            {
-                var number = Calculator.Calculate("( 1 / 2 ) - 1 + 1)");
-                Assert.Fail("No exception throw");
-            }
-            catch(AssertFailedException ex)
-            {
-                throw;
-            }
-            catch (Exception ex) { }
+            Assert.ThrowsException<Exception>(() => Calculator.Calculate("( 1 / 2 ) - 1 + 1)"));
         }
 
         [TestMethod()]
         public void CalculateTestMissingCloseBracket()
         {
-            try
-            {
-                var number = Calculator.Calculate("(( 1 / 2 ) - 1 + 1");
-                Assert.Fail("No exception throw");
-            }
-            catch (AssertFailedException ex)
-            {
-                throw;
-            }
-            catch (Exception ex) { }
+            Assert.ThrowsException<Exception>(() => Calculator.Calculate("(( 1 / 2 ) - 1 + 1"));
         }
 
         #endregion
